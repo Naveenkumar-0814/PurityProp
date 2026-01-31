@@ -32,13 +32,7 @@ app.include_router(auth_router)
 app.include_router(router)
 
 
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database on startup."""
-    init_db()
-    print(f"🚀 {settings.app_name} started successfully!")
-    print(f"📊 Database: {settings.database_url}")
-    print(f"🤖 LLM Model: {settings.llm_model}")
+
 
 
 @app.get("/")
@@ -60,4 +54,5 @@ if __name__ == "__main__":
         port=8000,
         reload=settings.debug
     )
+
 
