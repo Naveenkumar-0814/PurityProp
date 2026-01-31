@@ -6,7 +6,6 @@ Main application entry point
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.database import init_db
 from app.routes import router
 from app.auth_routes import router as auth_router
 
@@ -61,3 +60,4 @@ if __name__ == "__main__":
         port=8000,
         reload=settings.debug
     )
+
