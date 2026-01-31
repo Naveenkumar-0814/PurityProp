@@ -1,3 +1,7 @@
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
 import React from 'react';
 import { Send, Loader2 } from 'lucide-react';
 
@@ -48,3 +52,4 @@ const ChatInput = ({ onSend, disabled, loading }) => {
 };
 
 export default ChatInput;
+
