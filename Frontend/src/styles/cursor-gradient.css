@@ -1,0 +1,90 @@
+/* ===== Text Selection Gradient Effect ===== */
+
+/* Beautiful gradient on text selection */
+::selection {
+    background: linear-gradient(135deg,
+            rgba(20, 184, 166, 0.5),
+            rgba(16, 185, 129, 0.5));
+    color: #FFFFFF;
+    text-shadow: 0 0 8px rgba(20, 184, 166, 0.6);
+}
+
+::-moz-selection {
+    background: linear-gradient(135deg,
+            rgba(20, 184, 166, 0.5),
+            rgba(16, 185, 129, 0.5));
+    color: #FFFFFF;
+    text-shadow: 0 0 8px rgba(20, 184, 166, 0.6);
+}
+
+/* Glow effect on interactive elements */
+button:hover,
+.sidebar-nav-item:hover,
+.chat-input:hover,
+input:hover,
+.card:hover {
+    box-shadow:
+        0 0 20px rgba(20, 184, 166, 0.3),
+        0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+/* Subtle glow on focus */\ninput:focus,\ntextarea:focus,\n.chat-input:focus {\n  outline: none;\n  box-shadow: 0 0 20px rgba(20, 184, 166, 0.2), 0 2px 12px rgba(0, 0, 0, 0.4);\n}
+
+/* Animated gradient on buttons */
+.auth-button,
+.send-button,
+.new-chat-button {
+    background: linear-gradient(135deg,
+            #14B8A6,
+            #10B981);
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+    transition: all 0.3s ease;
+}
+
+.auth-button:hover,
+.send-button:hover,
+.new-chat-button:hover {
+    background-position: right center;
+    box-shadow:
+        0 0 30px rgba(20, 184, 166, 0.5),
+        0 8px 24px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+}
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Sidebar item gradient on hover */
+.sidebar-nav-item:hover {
+    background: linear-gradient(90deg,
+            rgba(20, 184, 166, 0.15),
+            rgba(16, 185, 129, 0.1));
+    border-left: 3px solid #14B8A6;
+}
+
+/* Card gradient glow on hover */
+.card:hover,
+.message:hover {
+    background: linear-gradient(135deg,
+            rgba(26, 35, 50, 0.9),
+            rgba(30, 42, 58, 0.9));
+    border: 1px solid rgba(20, 184, 166, 0.3);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}

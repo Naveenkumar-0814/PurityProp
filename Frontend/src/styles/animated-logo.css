@@ -1,0 +1,76 @@
+/* Animated Logo Styles - Updated */
+.animated-logo-container {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.animated-logo-container:hover {
+    transform: scale(1.05);
+}
+
+.logo-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* 
+   3 Layers Strategy:
+   1. Inner Hub (Static) - 0%
+   2. Middle Spokes (Rotating) - 0% to 39%
+   3. Outer Ring (Static) - 39% to 100%
+*/
+
+.inner-hub {
+    z-index: 3;
+    --r1: 0%;
+    -webkit-mask-image: radial-gradient(black var(--r1), transparent calc(var(--r1) + 1%));
+    mask-image: radial-gradient(black var(--r1), transparent calc(var(--r1) + 1%));
+}
+
+.middle-spokes {
+    z-index: 2;
+    --r1: 0%;
+    --r2: 39%;
+    /* Donut mask */
+    -webkit-mask-image: radial-gradient(transparent var(--r1), black calc(var(--r1) + 1%), black var(--r2), transparent calc(var(--r2) + 1%));
+    mask-image: radial-gradient(transparent var(--r1), black calc(var(--r1) + 1%), black var(--r2), transparent calc(var(--r2) + 1%));
+
+    /* Animation */
+    animation: rotate-in 1s ease-out forwards, spin 10s linear infinite 1s;
+}
+
+.outer-ring {
+    z-index: 1;
+    --r2: 39%;
+    -webkit-mask-image: radial-gradient(transparent var(--r2), black calc(var(--r2) + 1%));
+    mask-image: radial-gradient(transparent var(--r2), black calc(var(--r2) + 1%));
+}
+
+@keyframes rotate-in {
+    0% {
+        transform: rotate(-90deg) scale(0.5);
+        opacity: 0;
+    }
+
+    100% {
+        transform: rotate(0deg) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
