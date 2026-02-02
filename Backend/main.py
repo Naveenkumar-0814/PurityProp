@@ -16,17 +16,21 @@ app = FastAPI(
     debug=settings.debug
 )
 
-# CORS
+# ✅ CORRECT CORS CONFIG (NO OPTIONS HANDLER NEEDED)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
-    allow_credentials=True,
+    allow_origins=[
+        "http://localhost:5173",
+        "https://purity-prop-f.vercel.app",
+        "https://purity-prop-f-git-main-naveens-projects-36f95ce0.vercel.app"
+    ],
+    allow_credentials=False,  # 🔴 MUST BE FALSE (JWT via headers)
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Routers
-app.include_router(auth_router)
+# ✅ Routers (DO NOT add extra prefix)
+app.include_router(auth_router)   # /api/auth/...
 app.include_router(api_router)
 
 @app.get("/")
