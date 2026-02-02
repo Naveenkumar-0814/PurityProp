@@ -1,89 +1,95 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useState, useContext, useEffect } from "react";
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL; // 👈 REQUIRED
 
 const AuthContext = createContext(null);
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
-        throw new Error('useAuth must be used within AuthProvider');
+        throw new Error("useAuth must be used within AuthProvider");
     }
     return context;
 };
 
+// ✅ Single axios instance (BEST PRACTICE)
+const api = axios.create({
+    baseURL: API_URL,
+    headers: {
+        "Content-Type": "application/json",
+    },
+});
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('token'));
+    const [token, setToken] = useState(localStorage.getItem("token"));
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check if user is logged in on mount
         if (token) {
             fetchCurrentUser();
         } else {
             setLoading(false);
         }
 
-        // Axios Interceptor for automated token refresh
-        const interceptor = axios.interceptors.response.use(
+        // ✅ Token refresh interceptor
+        const interceptor = api.interceptors.response.use(
             (response) => response,
             async (error) => {
                 const originalRequest = error.config;
-                // If 401 Unauthorized and not already retried
+
                 if (error.response?.status === 401 && !originalRequest._retry) {
                     originalRequest._retry = true;
                     try {
-                        const refreshToken = localStorage.getItem('refresh_token');
-                        if (!refreshToken) throw new Error('No refresh token');
+                        const refreshToken = localStorage.getItem("refresh_token");
+                        if (!refreshToken) throw new Error("No refresh token");
 
-                        const res = await axios.post('/api/auth/refresh', { refresh_token: refreshToken });
+                        const res = await api.post("/api/auth/refresh", {
+                            refresh_token: refreshToken,
+                        });
+
                         const { access_token } = res.data;
 
-                        // Update local storage and state
-                        localStorage.setItem('token', access_token);
+                        localStorage.setItem("token", access_token);
                         setToken(access_token);
 
-                        // Update header and retry
-                        originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
-                        return axios(originalRequest);
-                    } catch (refreshError) {
-                        // Refresh failed (token expired or invalid)
+                        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+                        return api(originalRequest);
+                    } catch (err) {
                         logout();
-                        return Promise.reject(refreshError);
+                        return Promise.reject(err);
                     }
                 }
                 return Promise.reject(error);
             }
         );
 
-        // Cleanup interceptor on unmount
         return () => {
-            axios.interceptors.response.eject(interceptor);
+            api.interceptors.response.eject(interceptor);
         };
     }, []);
 
     const fetchCurrentUser = async () => {
         try {
-            const response = await axios.get('/api/auth/me', {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await api.get("/api/auth/me", {
+                headers: { Authorization: `Bearer ${token}` },
             });
             setUser(response.data);
-        } catch (error) {
-            // Let the interceptor handle 401s, but if it fails completely:
-            if (!localStorage.getItem('token')) {
-                logout();
-            }
+        } catch {
+            logout();
         } finally {
             setLoading(false);
         }
     };
 
     const login = async (email, password) => {
-        const response = await axios.post('/api/auth/login', { email, password });
+        const response = await api.post("/api/auth/login", { email, password });
+
         const { access_token, refresh_token, user: userData } = response.data;
 
-        localStorage.setItem('token', access_token);
-        localStorage.setItem('refresh_token', refresh_token);
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("refresh_token", refresh_token);
         setToken(access_token);
         setUser(userData);
 
@@ -91,11 +97,16 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (name, email, password) => {
-        const response = await axios.post('/api/auth/register', { name, email, password });
+        const response = await api.post("/api/auth/register", {
+            name,
+            email,
+            password,
+        });
+
         const { access_token, refresh_token, user: userData } = response.data;
 
-        localStorage.setItem('token', access_token);
-        localStorage.setItem('refresh_token', refresh_token);
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("refresh_token", refresh_token);
         setToken(access_token);
         setUser(userData);
 
@@ -103,21 +114,25 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refresh_token');
+        localStorage.removeItem("token");
+        localStorage.removeItem("refresh_token");
         setToken(null);
         setUser(null);
     };
 
-    const value = {
-        user,
-        token,
-        loading,
-        login,
-        register,
-        logout,
-        isAuthenticated: !!user
-    };
-
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider
+            value={{
+                user,
+                token,
+                loading,
+                login,
+                register,
+                logout,
+                isAuthenticated: !!user,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
 };
